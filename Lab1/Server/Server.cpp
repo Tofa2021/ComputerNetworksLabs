@@ -56,8 +56,8 @@ int main()
 		if (clientSocket != INVALID_SOCKET) {
 			char ipString[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &remoteAddress.sin_addr, ipString, sizeof(ipString));
-			cout << "Client connected. IP: " << ipString
-				<< "Client Port: " << ntohs(remoteAddress.sin_port) << endl;
+			cout << "Client connected. IP: " << ipString << " "
+				 << "Client Port: " << ntohs(remoteAddress.sin_port) << endl;
 			
 			char coordString[255];
 			int bytesRecived;
