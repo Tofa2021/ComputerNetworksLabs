@@ -38,34 +38,33 @@ int main()
 
 	SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-	struct sockaddr_in localAddress;
-	localAddress.sin_family = AF_INET;
-	localAddress.sin_port = htons(1280);
-	localAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	struct sockaddr_in serverAddress;
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_port = htons(1280);
+	serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	bind(serverSocket, (struct sockaddr*)&localAddress, sizeof(localAddress));
+	bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 
 	listen(serverSocket, 5);
-	cout << "Server was started" << endl;
+	cout << "Server has been started" << endl;
 	while (true) {
-		sockaddr_in remoteAddress;
-		int remoteAddressSize = sizeof(remoteAddress);
+		sockaddr_in clientAddress;
+		int clientAddressSize = sizeof(clientAddress);
 
-		SOCKET clientSocket = accept(serverSocket, (struct sockaddr*)&remoteAddress, &remoteAddressSize);
+		SOCKET clientSocket = accept(serverSocket, (struct sockaddr*) &clientAddress, &clientAddressSize);
 
 		if (clientSocket != INVALID_SOCKET) {
 			char ipString[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &remoteAddress.sin_addr, ipString, sizeof(ipString));
+			inet_ntop(AF_INET, &clientAddress.sin_addr, ipString, sizeof(ipString));
 			cout << "Client connected. IP: " << ipString << " "
-				 << "Client Port: " << ntohs(remoteAddress.sin_port) << endl;
+				 << "Client Port: " << ntohs(clientAddress.sin_port) << endl;
 			
-			char coordString[255];
-			int bytesRecived;
-			while (bytesRecived = recv(clientSocket, coordString, sizeof(coordString), 0) != 0) {
-				coordString[bytesRecived] = '\0';
+			char recivedBuffer[255];
+			while (int recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0) != 0) {
+				recivedBuffer[recivedBytesCount] = '\0';
 
 				int x, y, quaterNumber;
-				sscanf_s(coordString, "%d %d", &x, &y);
+				sscanf_s(recivedBuffer, "%d %d", &x, &y);
 
 				quaterNumber = calculateQuaterNumber(x, y);
 
