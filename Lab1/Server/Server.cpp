@@ -34,18 +34,37 @@ int main()
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	wVersionRequested = MAKEWORD(2, 2);
-	WSAStartup(wVersionRequested, &wsaData);
+	if (WSAStartup(wVersionRequested, &wsaData) == WSAVERNOTSUPPORTED) {
+		cout << "WSAStartup error" << endl;
+		return -1;
+	}
 
 	SOCKET serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (serverSocket == INVALID_SOCKET) {
+		WSACleanup();
+		cout << "Invalid socket" << endl;
+		return -1;
+	}
 
 	struct sockaddr_in serverAddress;
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_port = htons(1280);
 	serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+	if (bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
+		closesocket(serverSocket);
+		WSACleanup();
+		cout << "Binding failed" << endl;
+		return -1;
+	}
 
-	listen(serverSocket, 5);
+	if (listen(serverSocket, SOMAXCONN)) {
+		closesocket(serverSocket);
+		WSACleanup();
+		cout << "Listening failed" << endl;
+		return -1;
+	}
+
 	cout << "Server has been started" << endl;
 	while (true) {
 		sockaddr_in clientAddress;
@@ -54,16 +73,20 @@ int main()
 		SOCKET clientSocket = accept(serverSocket, (struct sockaddr*) &clientAddress, &clientAddressSize);
 
 		if (clientSocket != INVALID_SOCKET) {
-			char ipString[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &clientAddress.sin_addr, ipString, sizeof(ipString));
-			cout << "Client connected. IP: " << ipString << " "
-				 << "Client Port: " << ntohs(clientAddress.sin_port) << endl;
-			
+			cout << "Client connected" << endl;
+
 			char recivedBuffer[255];
-			while (int recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0) != 0) {
-				recivedBuffer[recivedBytesCount] = '\0';
+			int recivedBytesCount;
+			while ((recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0)) != 0) {
+				if (recivedBytesCount < sizeof(recivedBuffer)) {
+					recivedBuffer[recivedBytesCount] = '\0'; 
+				}
+				else {
+					recivedBuffer[sizeof(recivedBytesCount) - 1] = '\n';
+				}
 
 				int x, y, quaterNumber;
+				cout << "Recived string: " << recivedBuffer << endl;
 				sscanf_s(recivedBuffer, "%d %d", &x, &y);
 
 				quaterNumber = calculateQuaterNumber(x, y);
