@@ -72,29 +72,33 @@ int main()
 
 		SOCKET clientSocket = accept(serverSocket, (struct sockaddr*) &clientAddress, &clientAddressSize);
 
-		if (clientSocket != INVALID_SOCKET) {
-			cout << "Client connected" << endl;
+		if (clientSocket == INVALID_SOCKET) {
+			cout << "Accept failed" << endl;
+			continue;
+		}
 
-			char recivedBuffer[255];
-			int recivedBytesCount;
-			while ((recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0)) != 0) {
-				if (recivedBytesCount < sizeof(recivedBuffer)) {
-					recivedBuffer[recivedBytesCount] = '\0'; 
-				}
-				else {
-					recivedBuffer[sizeof(recivedBytesCount) - 1] = '\n';
-				}
+		cout << "Client connected" << endl;
 
-				int x, y, quaterNumber;
-				cout << "Recived string: " << recivedBuffer << endl;
-				sscanf_s(recivedBuffer, "%d %d", &x, &y);
-
-				quaterNumber = calculateQuaterNumber(x, y);
-
-				char result[100];
-				sprintf_s(result, "%d", quaterNumber);
-				send(clientSocket, result, strlen(result) + 1, 0);
+		char recivedBuffer[255];
+		int recivedBytesCount;
+		while ((recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0)) != 0) {
+			if (recivedBytesCount < sizeof(recivedBuffer)) {
+				recivedBuffer[recivedBytesCount] = '\0'; 
 			}
+			else {
+				recivedBuffer[sizeof(recivedBytesCount) - 1] = '\0';
+			}
+
+			int x, y, quaterNumber;
+			cout << "Recived string: " << recivedBuffer << endl;
+			sscanf_s(recivedBuffer, "%d %d", &x, &y);
+
+			quaterNumber = calculateQuaterNumber(x, y);
+
+			char sendBuffer[100];
+			sprintf_s(sendBuffer, "%d", quaterNumber);
+			cout << "Send string: " << sendBuffer << endl;
+			send(clientSocket, sendBuffer, strlen(sendBuffer) + 1, 0);
 		}
 
 		closesocket(clientSocket);
