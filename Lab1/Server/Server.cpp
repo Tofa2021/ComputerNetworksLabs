@@ -90,14 +90,14 @@ int main()
 			}
 
 			int x, y, quaterNumber;
-			cout << "Recived string: " << recivedBuffer << endl;
 			sscanf_s(recivedBuffer, "%d %d", &x, &y);
+			cout << "Recived data: x:" << x << " y:" << y << endl;
 
 			quaterNumber = calculateQuaterNumber(x, y);
 
 			char sendBuffer[100];
 			sprintf_s(sendBuffer, "%d", quaterNumber);
-			cout << "Send string: " << sendBuffer << endl;
+			cout << "Send: " << sendBuffer << endl;
 			send(clientSocket, sendBuffer, strlen(sendBuffer) + 1, 0);
 		}
 

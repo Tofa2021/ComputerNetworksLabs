@@ -43,8 +43,8 @@ int main()
 
     char sendBuffer[255];
     sprintf_s(sendBuffer, "%d %d", x, y);
-
-    send(clientSocket, sendBuffer, strlen(sendBuffer) + 1, 0);
+    cout << "Send string: " << sendBuffer << endl;
+    send(clientSocket, sendBuffer, strlen(sendBuffer), 0);
 
     char recivedBuffer[255];
     int recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0);
