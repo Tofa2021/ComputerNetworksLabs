@@ -34,7 +34,6 @@ int main()
 	struct sockaddr_in clientAddress;
 	int clientAddressSize = sizeof(clientAddress);
 
-
 	bind(serverSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress));
 
 	char recivedBuffer[100];
