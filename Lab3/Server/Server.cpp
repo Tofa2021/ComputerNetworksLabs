@@ -12,6 +12,7 @@ void clientHandler(SOCKET clientSocket) {
 	char recivedBuffer[255];
 	int recivedBytesCount;
 	recivedBytesCount = recv(clientSocket, recivedBuffer, sizeof(recivedBuffer), 0);
+	recivedBuffer[recivedBytesCount] = '\0';
 	cout << "Recived: " << recivedBuffer << endl;
 
 	for (int i = 0; i < strlen(recivedBuffer) - 1; i += 2) {
